@@ -25,6 +25,8 @@ python3 nibbler <to_email>
 
 I recommend using a cron job to run the aggregator and send the newsletter daily.
 
+You will need a subscriptions.xml (an OPML file) in the same dir as nibbler or pass it the subscription dir in the command line options. 
+
 # License
 
 MIT license, a permissive open-source license.
