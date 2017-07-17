@@ -310,11 +310,11 @@ class Newsletter(object):
         self.cleaner = HTMLNormalizer(appconfig)
 
     def build_newsletter(self, articles):
-        subject = '{} {}'.format("A Daily Nibble of News -- ", datetime.now().ctime())
+        subject = '{} {}'.format("Today's News Nibble -- ", datetime.now().ctime())
         env = Environment(loader=PackageLoader('nibbler', 'templates'))
         template = env.get_template('nibble.html')
         html = template.render(articles=articles)
-        text = "A Daily Nibble of News"
+        text = "Today's News Nibble"
         images = {"image1": "./resources/system.png", "image2": "./resources/GitHub-Mark-Light-32px.png"}
 
         self.es.build_html_email(self.config.from_email, self.config.to_email, subject, text, html, images, self.filename)
@@ -340,7 +340,7 @@ class Newsletter(object):
 class NibblerConfig(object):
     """Processes configuration for Nibbler, current implementaton is to handle it as options on command line"""
 
-    def __init__(self, to_email, log_dir=None, sub_dir=None, db_dir=None, email_dir=None, from_email='nibbler@nibbler.com'):
+    def __init__(self, to_email, log_dir=None, sub_dir=None, db_dir=None, email_dir=None, from_email=None):
         logger.info("Initializing configuration")
         # Load configuration
         self.work_dir = os.path.dirname(os.path.abspath(__file__))
@@ -349,7 +349,8 @@ class NibblerConfig(object):
         self._sub_dir = sub_dir
         self._db_dir = db_dir
         self._email_dir = email_dir
-        self.from_email = from_email
+        if (from_email is None):
+            self.from_email = 'nibbler@nibbler.com'
 
     def get_log_dir(self):
         if (self._log_dir is None):
