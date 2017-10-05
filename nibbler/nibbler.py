@@ -340,17 +340,17 @@ class Newsletter(object):
 class NibblerConfig(object):
     """Processes configuration for Nibbler, current implementaton is to handle it as options on command line"""
 
-    def __init__(self, to_email, log_dir=None, sub_dir=None, db_dir=None, email_dir=None, from_email=None):
+    def __init__(self, to_email, from_email, log_dir=None, sub_dir=None, db_dir=None, email_dir=None):
         logger.info("Initializing configuration")
         # Load configuration
         self.work_dir = os.path.dirname(os.path.abspath(__file__))
         self.to_email = to_email
+        self.from_email = from_email
         self._log_dir = log_dir
         self._sub_dir = sub_dir
         self._db_dir = db_dir
         self._email_dir = email_dir
-        if (from_email is None):
-            self.from_email = 'nibbler@nibbler.com'
+
 
     def get_log_dir(self):
         if (self._log_dir is None):
@@ -391,13 +391,14 @@ class NibblerConfig(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='nibbler', description='A simple RSS to email application.')
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1')
     parser.add_argument('to_email', metavar='to_email', help='To email address; youremail@example.com')
+    parser.add_argument('from_email', metavar='from_email', help='From email address; nibble@example.com')
     parser.add_argument('-l', '--log-dir', metavar='log_dir', help='path to log dir')
     parser.add_argument('-d', '--db-dir', metavar='db_dir', help='path to sqlite db dir')
     parser.add_argument('-s', '--sub-dir', metavar='sub_dir', help='path to subscriptions.xml file')
     parser.add_argument('-e', '--email-dir', metavar='email_dir', help='path to diretory where email file is output before sending')
-    parser.add_argument('-f', '--from_email', metavar='from_email', help='From email address; nibble@nibbler.com')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1')
+
     args = parser.parse_args()
 
     # Initialize configuration
