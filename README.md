@@ -21,11 +21,13 @@ Nibbler requires:
 
 nibbler hopes to be on pypi soon, otherwise, just run:
 
-python3 nibbler <to_email>
+python3 nibbler <to_email> <from_email>
 
-I recommend using a cron job to run the aggregator and send the newsletter daily.
+The from email should be for a domain on which you are running email. This will help prevent your email from going to spam. 
 
 You will need a subscriptions.xml (an OPML file) in the same dir as nibbler or pass it the subscription dir in the command line options. 
+
+I recommend using a cron job to run the aggregator and send the newsletter daily.
 
 # License
 
