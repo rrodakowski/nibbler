@@ -8,7 +8,7 @@ It is designed to run once day and puts all of your articles in a single email f
 # Requirements
 
 Nibbler is a python application tested on 3.+
-I have only run it on *nix machines.
+I have only run it on Ubuntu Linux and Mac machines.
 
 # Dependencies
 
@@ -21,11 +21,11 @@ Nibbler requires:
 
 nibbler hopes to be on pypi soon, otherwise, just run:
 
-python3 nibbler <to_email> <from_email>
+python3 nibbler <to_email> <from_email> <dir_to_subscriptions>
 
-The from email should be for a domain on which you are running email. This will help prevent your email from going to spam. 
+The from email should be for a domain on which you are running email. This will help prevent your email from going to spam.
 
-You will need a subscriptions.xml (an OPML file) in the same dir as nibbler or pass it the subscription dir in the command line options. 
+Pass in the directory in which you have a subscriptions.xml (an OPML file) as the third argument.
 
 I recommend using a cron job to run the aggregator and send the newsletter daily.
 

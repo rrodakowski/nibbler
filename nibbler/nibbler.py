@@ -211,7 +211,7 @@ class FeedAcquirer(object):
                 self.dal.store_post(article)
 
     def load_new_feeds(self):
-        sub_file = os.path.join(self.config.get_sub_dir(), 'subscriptions.xml')
+        sub_file = os.path.join(self.config.sub_dir, 'subscriptions.xml')
         outline = opml.parse(sub_file)
         # if there are feeds in subscription.xml that are not in the database, add them
         for feed in outline:
@@ -341,14 +341,14 @@ class Newsletter(object):
 class NibblerConfig(object):
     """Processes configuration for Nibbler, current implementaton is to handle it as options on command line"""
 
-    def __init__(self, to_email, from_email, log_dir=None, sub_dir=None, db_dir=None, email_dir=None):
+    def __init__(self, to_email, from_email, sub_dir, log_dir=None, db_dir=None, email_dir=None):
         logger.info("Initializing configuration")
         # Load configuration
         self.work_dir = os.path.dirname(os.path.abspath(__file__))
         self.to_email = to_email
         self.from_email = from_email
+        self.sub_dir = sub_dir
         self._log_dir = log_dir
-        self._sub_dir = sub_dir
         self._db_dir = db_dir
         self._email_dir = email_dir
 
@@ -358,12 +358,6 @@ class NibblerConfig(object):
             self._log_dir = self.work_dir
         logger.debug("log_dir: " + self._log_dir)
         return self._log_dir
-
-    def get_sub_dir(self):
-        if (self._sub_dir is None):
-            self._sub_dir = self.work_dir
-        logger.debug("sub_dir: " +self._sub_dir)
-        return self._sub_dir
 
     def get_email_dir(self):
         if (self._email_dir is None):
@@ -394,7 +388,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='nibbler', description='A simple RSS to email application.')
     parser.add_argument('to_email', metavar='to_email', help='To email address; youremail@example.com')
     parser.add_argument('from_email', metavar='from_email', help='From email address; nibble@example.com')
-    parser.add_argument('-s', '--sub-dir', metavar='sub_dir', help='path to subscriptions.xml file')
+    parser.add_argument('sub-dir', metavar='sub_dir', help='path to subscriptions.xml file')
     parser.add_argument('-l', '--log-dir', metavar='log_dir', help='path to log dir')
     parser.add_argument('-d', '--db-dir', metavar='db_dir', help='path to sqlite db dir')
     parser.add_argument('-e', '--email-dir', metavar='email_dir', help='path to directory where email file is output before sending')
