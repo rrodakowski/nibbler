@@ -303,6 +303,7 @@ class Newsletter(object):
         logger.info("Init for BuildNewsletter")
         self.config = appconfig
         self.filename = os.path.join(self.config.get_email_dir(), 'nibbler_{}.eml'.format(datetime.now().strftime('%Y%m%d')))
+        self.resource_dir = os.path.join(self.config.work_dir, "resources")
         self.es = EmailService()
         self.dal = dal
 
@@ -315,7 +316,7 @@ class Newsletter(object):
         template = env.get_template('nibble.html')
         html = template.render(articles=articles)
         text = "Today's News Nibble"
-        images = {"image1": "./resources/system.png", "image2": "./resources/GitHub-Mark-Light-32px.png"}
+        images = {"image1": os.path.join(self.resource_dir,"system.png"), "image2": os.path.join(self.resource_dir, "GitHub-Mark-Light-32px.png")}
 
         self.es.build_html_email(self.config.from_email, self.config.to_email, subject, text, html, images, self.filename)
 
@@ -396,7 +397,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--sub-dir', metavar='sub_dir', help='path to subscriptions.xml file')
     parser.add_argument('-l', '--log-dir', metavar='log_dir', help='path to log dir')
     parser.add_argument('-d', '--db-dir', metavar='db_dir', help='path to sqlite db dir')
-    parser.add_argument('-e', '--email-dir', metavar='email_dir', help='path to diretory where email file is output before sending')
+    parser.add_argument('-e', '--email-dir', metavar='email_dir', help='path to directory where email file is output before sending')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1')
 
     args = parser.parse_args()
