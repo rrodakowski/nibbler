@@ -15,7 +15,7 @@ I have only run it on *nix machines.
 Nibbler requires:
 
 * A Mail Transfer Agent on the system, such as Sendmail or Postfix.
-* It requires Python packages OPML and sqlalchemy
+* It requires Python packages opml ,lxml, feedparser, SQLAlchemy, Jinja2
 
 # Installation
 

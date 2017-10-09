@@ -32,5 +32,6 @@ setup(
         "SQLAlchemy",
         "feedparser",
         "opml",
+        "Jinja2",
     ],
 )
