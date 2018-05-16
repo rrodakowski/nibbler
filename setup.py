@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     # Application name:
@@ -34,4 +34,11 @@ setup(
         "opml",
         "Jinja2",
     ],
+
+    entry_points={
+        'console_scripts': [
+            # "name_of_executable = module.with:function_to_execute"
+            "nibbler = nibbler.__main__:main"
+        ]
+    },
 )
