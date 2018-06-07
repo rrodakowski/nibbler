@@ -7,7 +7,7 @@ from nibbler import HTMLNormalizer
 
 class NibblerTestCase(unittest.TestCase):
     """Base class for all Nibbler tests."""
-    arguments = {'from_email': 'from@test.com', 'to_email': 'to@test.com', 'log_dir': '/app-data/logs/nibbler-logs'}
+    arguments = {'from_email': 'from@test.com', 'to_email': 'to@test.com', 'log_dir': '/app-data/logs/nibbler-logs', 'sub_dir': '/app-bin'}
 
     def assertCostEqual(self, p, cost):
         """Custom assert here: `p`'s cost is equal to `cost`."""
@@ -49,6 +49,13 @@ class TestHTMLNormalizer(NibblerTestCase):
         clean_html = '<p>I added some text <a href="http://www.jamesaltucher.com/2017/03/matt-mullenweg/">joined in for the James Altucher<img src="https://i1.wp.com/ma.tt/files/2017/04/ultralight.gif?resize=500%2C288&amp;ssl=1" alt="ultralight.gif"> podcast in an episode that covered a lot of ground</a>. It just needs to be two-way.</p>'
         email_html = '<p>I added some text <a href="http://www.jamesaltucher.com/2017/03/matt-mullenweg/">joined in for the James Altucher<img src="https://i1.wp.com/ma.tt/files/2017/04/ultralight.gif?resize=500%2C288&amp;ssl=1" alt="ultralight.gif" width="480" height="320" border="0"> podcast in an episode that covered a lot of ground</a>. It just needs to be two-way.</p>'
         self.assertEqual(email_html, self.normalizer.add_email_markup(clean_html))
+
+    def test_add_full_image_path(self):
+        link = 'https://kottke.org/18/06/the-problem-with-action-scenes-in-dc-movies'
+        input_html= '<p><img src="/plus/misc/images/ai-image-iso-02.jpg" alt="AI image in the dark"></p>'
+        email_html = '<p><img src="https://kottke.org/plus/misc/images/ai-image-iso-02.jpg" alt="AI image in the dark"></p>'
+        self.assertEqual(email_html, self.normalizer.add_full_image_path(input_html, link))
+
 
     def tearDown(self):
         pass

@@ -149,6 +149,17 @@ class HTMLNormalizer(object):
                 tag.attrib.pop(attribute)
         return lxml.html.tostring(domhtml).decode("utf-8")
 
+    def add_full_image_path(self, article, link):
+        domarticle = lxml.html.fromstring(article.encode("utf-8"))
+        last_index = link.rindex('.')    
+        last_index = last_index + 4
+        link_prefix = link[0: last_index]
+        for img in domarticle.xpath('//img'):
+            if 'http' not in img.attrib['src']:
+                img.attrib['src']=link_prefix + img.attrib['src']
+
+        return lxml.html.tostring(domarticle).decode("utf-8")
+
     def add_email_markup(self, article):
         attrs = self.config.get_email_image_styles()
         domarticle = lxml.html.fromstring(article.encode("utf-8"))
@@ -190,6 +201,7 @@ class FeedAcquirer(object):
 
         if "content" in post:
             article.article_text = self.cleaner.clean_html(post.content[0].value)
+            article.article_text = self.cleaner.add_full_image_path(article.article_text, article.link)
         else:
             if "description" in post:
                 article.article_text = self.cleaner.clean_html(post.description)
