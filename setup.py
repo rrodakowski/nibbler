@@ -16,7 +16,7 @@ setup(
 
     # Include additional files into the package
     package_data={
-        'nibbler': ['templates/*'],
+        'nibbler.templates': ['*'],
         'nibbler': ['resources/*']
     },
     include_package_data=True,
