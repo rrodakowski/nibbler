@@ -102,7 +102,7 @@ class DatabaseAccess(object):
     def get_post(self, guid):
         results = self.session.query(Article, Feed).filter(Article.feed_id == Feed.feed_id).filter(Article.guid == guid).all()
         if not results:
-            logger.warn("Nibbler could not find a post with guid: {}".format(guid))
+            logger.warning("Nibbler could not find a post with guid: {}".format(guid))
         else:
             # convert list of tuples into one article object
             article_info = results[0]
@@ -151,12 +151,12 @@ class HTMLNormalizer(object):
 
     def add_full_image_path(self, article, link):
         domarticle = lxml.html.fromstring(article.encode("utf-8"))
-        last_index = link.rindex('.')    
+        last_index = link.rindex('.')
         last_index = last_index + 4
         link_prefix = link[0: last_index]
         for img in domarticle.xpath('//img'):
             if 'http' not in img.attrib['src']:
-                img.attrib['src']=link_prefix + img.attrib['src']
+                img.attrib['src'] = link_prefix + img.attrib['src']
 
         return lxml.html.tostring(domarticle).decode("utf-8")
 
@@ -165,13 +165,14 @@ class HTMLNormalizer(object):
         domarticle = lxml.html.fromstring(article.encode("utf-8"))
 
         for img in domarticle.xpath('//img'):
-            img.attrib['width']=str(attrs['width'])
-            img.attrib['height']=str(attrs['height'])
-            img.attrib['border']=str(attrs['border'])
+            img.attrib['width'] = str(attrs['width'])
+            img.attrib['height'] = str(attrs['height'])
+            img.attrib['border'] = str(attrs['border'])
         return lxml.html.tostring(domarticle).decode("utf-8")
 
 
 class FeedAcquirer(object):
+    """ Parses rss feed and stores new posts """
 
     def __init__(self, dal, appconfig):
         self.dal = dal
@@ -180,17 +181,32 @@ class FeedAcquirer(object):
         self.cleaner = HTMLNormalizer(appconfig)
 
     def parse_rss_post(self, post):
+        """ parses rss feed for information this aggregator requires """
         article = Article()
-        # Assume that most rss feeds have title and link populated
-        article.title = post.title
-        article.link = post.link
+
+        # Assume that all rss feeds have link populated
+        try:
+            article.link = post.link
+        except:
+            logger.error("There was no link in rss post. We need this value to proceed.")
+            return None
+
         # time we acquired this content
         article.time_stamp = datetime.now()
         #time.strftime("%Y%m%d")
+
+        # if there is no title, we will use link (which should always be there) as the title
+        if "title" in post:
+            article.title = post.title
+        else:
+            article.title = post.link
+
+        # if there is no guid, we'll use the title as the guid
+        # which above we set to have either the title or the link
         if "guid" in post:
             article.guid = post.guid
         else:
-            article.guid = post.title
+            article.guid = article.title
 
         logger.debug("We are parsing {}".format(article.guid))
 
@@ -210,18 +226,24 @@ class FeedAcquirer(object):
         return article
 
     def store_new_content(self, feed):
+        """ stores new posts in our database, so we will never send an email with them again """
         # get the feed data from the url
         rss_feed = feedparser.parse(feed.xmlUrl)
 
         for entry in rss_feed.entries:
             article = self.parse_rss_post(entry)
-            article.feed_id=feed.feed_id
-             # if post is already in the database, skip it
-            if not self.dal.is_post_in_db(article.guid):
-                posts_to_email.append(article.guid)
-                self.dal.store_post(article)
+            if article is not None: # article comes back none if there is an error
+                article.feed_id = feed.feed_id
+                # if post is already in the database, skip it
+                if not self.dal.is_post_in_db(article.guid):
+                    posts_to_email.append(article.guid)
+                    self.dal.store_post(article)
+            else:
+                logger.warning("We could not parse an article in feed {} and skipped it.".format(feed.feed_id))
+        return posts_to_email
 
     def load_new_feeds(self):
+        """ go through feeds to which we subscribe and add any new feeds to our database """
         sub_file = os.path.join(self.config.sub_dir, 'subscriptions.xml')
         outline = opml.parse(sub_file)
         # if there are feeds in subscription.xml that are not in the database, add them
@@ -231,6 +253,7 @@ class FeedAcquirer(object):
                 self.dal.session.commit()
 
     def main(self):
+        """ Workflow for the acquring feeds """
         logger.info("Starting to Acquire Content.")
 
         self.load_new_feeds()
