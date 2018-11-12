@@ -9,9 +9,9 @@ import feedparser
 # nibbler imports
 from nibbler.nibbler import NibblerConfig
 from nibbler.nibbler import HTMLNormalizer
-from nibbler.nibbler import FeedAcquirer
-from nibbler.nibbler import DatabaseAccess
-from nibbler.nibbler import posts_to_email
+#from nibbler.nibbler import FeedAcquirer
+#from nibbler.nibbler import DatabaseAccess
+import nibbler.nibbler
 
 class NibblerTestCase(unittest.TestCase):
     """Base class for all Nibbler tests."""
@@ -73,7 +73,7 @@ class TestFeedAcquirer(NibblerTestCase):
 
     def setUp(self):
         self.dal = Mock()
-        self.feedacquirer = FeedAcquirer(self.dal, NibblerConfig(**self.arguments))
+        self.feedacquirer = nibbler.nibbler.FeedAcquirer(self.dal, NibblerConfig(**self.arguments))
 
     def test_parse_rss_post_no_title(self):
         test_feed = """
@@ -192,37 +192,37 @@ class TestFeedAcquirer(NibblerTestCase):
             article = self.feedacquirer.parse_rss_post(entry)
             self.assertEqual(pub_date, article.pub_date, msg='{}, {}'.format(pub_date, article.pub_date))
 
-    # @patch.object(DatabaseAccess, 'is_post_in_db')
-    # def test_store_new_content(self, mock_is_post_in_db):
-    #     feed = Mock()
-    #     feed.xmlUrl = """
-    #     <feed xmlns="http://www.w3.org/2005/Atom">
-    #     <title>Daring Fireball</title>
-    #     <entry>
-    #     <title>Daring post</title>
-    #     <link rel="alternate" type="text/html" href="https://secure.actblue.com/donate/great_slate"/>
-    #     <link rel="shorturl" type="text/html" href="http://df4.us/r7j"/>
-    #     <link rel="related" type="text/html" href="https://daringfireball.net/linked/2018/10/25/donate-to-the-great-slate"/>
-    #     <id>tag:daringfireball.net,2018:/linked//6.35263</id>
-    #     <published>2018-10-26T03:59:00Z</published>
-    #     <updated>2018-10-26T04:30:33Z</updated>
-    #     <content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en">
-    #     <![CDATA[
-    #     <p>The Great Slate:</p> <blockquote> <p>Tech Solidarity is endorsing thirteen candidates for Congress. Each of them is a first-time progressive candidate with no ties to the political establishment, an excellent campaign team, and a clear path to victory in a poor, rural district that is being i
-    #     ]]>
-    #     </content>
-    #     </entry>"""
-    #     feed.feed_id = 1
-    #
-    #     logging.basicConfig()
-    #     log = logging.getLogger("LOG")
-    #
-    #     mock_is_post_in_db.return_value = False
-    #     articles_stored = self.feedacquirer.store_new_content(feed)
-    #     log.warning(feed.xmlUrl)
-    #     log.warning(feed.feed_id)
-    #     log.warning(mock_is_post_in_db.return_value)
-    #     self.assertEqual("tag:daringfireball.net,2018:/linked//6.35263", articles_stored)
+    #@patch('nibbler.nibbler.DatabaseAccess.is_post_in_db')
+    #@patch('nibbler.nibbler.DatabaseAccess.store_post')
+    @patch('nibbler.nibbler.DatabaseAccess')
+    def test_store_new_content(self, mock_dal):
+        feed = Mock()
+        feed.xmlUrl = """
+        <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>Daring Fireball</title>
+        <entry>
+        <title>Daring post</title>
+        <link rel="alternate" type="text/html" href="https://secure.actblue.com/donate/great_slate"/>
+        <link rel="shorturl" type="text/html" href="http://df4.us/r7j"/>
+        <link rel="related" type="text/html" href="https://daringfireball.net/linked/2018/10/25/donate-to-the-great-slate"/>
+        <id>tag:daringfireball.net,2018:/linked//6.35263</id>
+        <published>2018-10-26T03:59:00Z</published>
+        <updated>2018-10-26T04:30:33Z</updated>
+        <content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en">
+        <![CDATA[
+        <p>The Great Slate:</p> <blockquote> <p>Tech Solidarity is endorsing thirteen candidates for Congress. Each of them is a first-time progressive candidate with no ties to the political establishment, an excellent campaign team, and a clear path to victory in a poor, rural district that is being i
+        ]]>
+        </content>
+        </entry>"""
+        feed.feed_id = 1
+
+        mock_dal.is_post_in_db.return_value = False
+        mock_dal.store_post.return_value = True
+        #mock_is_post_in_db.return_value.is_post_in_db.return_value = False # means we will add it
+        #mock_store_post.return_value = True
+        feedacquirer = nibbler.nibbler.FeedAcquirer(mock_dal, NibblerConfig(**self.arguments))
+        articles_stored = feedacquirer.store_new_content(feed)
+        self.assertEqual("tag:daringfireball.net,2018:/linked//6.35263", articles_stored[0])
 
     def tearDown(self):
         pass
