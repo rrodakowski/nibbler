@@ -5,6 +5,8 @@ import logging
 
 # dependency imports
 import feedparser
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 # nibbler imports
 from nibbler.nibbler import NibblerConfig
@@ -15,7 +17,7 @@ import nibbler.nibbler
 
 class NibblerTestCase(unittest.TestCase):
     """Base class for all Nibbler tests."""
-    arguments = {'from_email': 'from@test.com', 'to_email': 'to@test.com', 'log_dir': '/app-data/logs/nibbler-logs', 'sub_dir': '/app-bin'}
+    arguments = {'from_email': 'randall.rodakowski@gmail.com', 'to_email': 'randall.rodakowski@gmail.com', 'log_dir': '/app-data/logs/nibbler-logs', 'sub_dir': '/app-bin', 'smtp_ini': './nibbler/tests/smtp_testdata.ini'}
 
     def assertCostEqual(self, p, cost):
         """Custom assert here: `p`'s cost is equal to `cost`."""
@@ -26,6 +28,18 @@ class TestNibblerConfig(NibblerTestCase):
 
     def setUp(self):
         self.config = NibblerConfig(**self.arguments)
+
+    def test_smtp_ini_with_values(self):
+        smtp_config = self.config.get_smtp_config()
+        self.assertEqual(smtp_config['username'], "sample_username")
+        self.assertEqual(smtp_config['password'], "Sample_Password/")
+        self.assertEqual(smtp_config['host'], "hostname.test.com")
+        self.assertEqual(smtp_config['port'], '587')
+
+    def test_smtp_ini_without_values(self):
+        arguments = {'from_email': 'randall.rodakowski@gmail.com', 'to_email': 'randall.rodakowski@gmail.com', 'sub_dir': '/app-bin'}
+        no_smtp_config = NibblerConfig(**arguments)
+        self.assertEqual(no_smtp_config.get_smtp_config(), None)
 
     def test_log_dir(self):
         self.assertEqual(self.config.get_log_dir(), "/app-data/logs/nibbler-logs")

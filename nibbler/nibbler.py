@@ -6,15 +6,15 @@ from datetime import datetime
 import sqlite3
 import logging
 import os
-import string
 import traceback
+import configparser
 
 # opml and feedparser
 import feedparser
 import opml
 
 # email imports
-from subprocess import call
+import smtplib  
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -281,7 +281,7 @@ class EmailService(object):
             file.write(line)
         file.close()
 
-    def build_html_email(self, from_email, to_email, subject, text, html, images, output_email_file):
+    def build_html_email(self, from_email, to_email, subject, text, html, images):
         logger.info("Creating an html email file. ")
         # couldn't figure out how to get the email to display so that it wasn't base64 encoded
         # this post on the interweb pointed out this line
@@ -323,20 +323,35 @@ class EmailService(object):
             msg_image.add_header('Content-ID', '<{}>'.format(image_id))
             msg_root.attach(msg_image)
 
-        self.write_text_to_file(output_email_file, msg_root.as_string())
+        return msg_root
 
-    @staticmethod
-    def send_email_file(email_file, to_email_address):
-        logger.info("Send email message to: "+to_email_address)
-        call('sendmail -v {} < {}'.format(to_email_address, email_file), shell=True)
+    def write_email_to_file(self, filename, email_msg):
+        self.es.write_text_to_file(filename, email_msg.as_string())
+
+    def send_smtp_email(self, sender, recipient, msg, host, port, smtp_username, smtp_password):
+        # Try to send the message.
+        try:    
+            server = smtplib.SMTP(host, port)
+            server.ehlo()
+            server.starttls()
+            #stmplib docs recommend calling ehlo() before & after starttls()
+            server.ehlo()
+            server.login(smtp_username, smtp_password)
+            server.sendmail(sender, recipient, msg.as_string())
+            server.close()
+        # Display an error message if something goes wrong.
+        except Exception as e:
+            logger.error("Send email message failed with error: ", e)
+        else:
+            logger.info("Send email message to: "+recipient)
 
 
-class Newsletter(object):
+
+class NibblerNewsletter(object):
 
     def __init__(self, dal, appconfig):
-        logger.info("Init for BuildNewsletter")
+        logger.info("Init for BuildNibblerNewsletter")
         self.config = appconfig
-        self.filename = os.path.join(self.config.get_email_dir(), 'nibbler_{}.eml'.format(datetime.now().strftime('%Y%m%d')))
         self.resource_dir = os.path.join(self.config.work_dir, "resources")
         self.es = EmailService()
         self.dal = dal
@@ -344,7 +359,7 @@ class Newsletter(object):
         # move this to dependency injection?
         self.cleaner = HTMLNormalizer(appconfig)
 
-    def build_newsletter(self, articles):
+    def build_nibbler_newsletter(self, articles):
         subject = '{} {}'.format("Today's News Nibble -- ", datetime.now().ctime())
         env = Environment(loader=PackageLoader('nibbler', 'templates'))
         template = env.get_template('nibble.html')
@@ -352,10 +367,10 @@ class Newsletter(object):
         text = "Today's News Nibble"
         images = {"image1": os.path.join(self.resource_dir,"system.png"), "image2": os.path.join(self.resource_dir, "GitHub-Mark-Light-32px.png")}
 
-        self.es.build_html_email(self.config.from_email, self.config.to_email, subject, text, html, images, self.filename)
+        return self.es.build_html_email(self.config.from_email, self.config.to_email, subject, text, html, images)
 
     def main(self):
-        logger.info("Starting to Build Newsletter.")
+        logger.info("Starting to Build and Send the Nibbler Newsletter.")
         articles = []
 
         if posts_to_email:
@@ -366,8 +381,18 @@ class Newsletter(object):
                 articles.append(article)
                 logger.info("Getting content for post title {} from feed {}.".format(article.title, article.feed_title))
 
-            self.build_newsletter(articles)
-            self.es.send_email_file(self.filename, self.config.to_email)
+            msg = self.build_nibbler_newsletter(articles)
+            smtp = self.config.get_smtp_config()
+            email_filename = os.path.join(self.config.get_email_dir(), 'nibbler_{}.eml'.format(datetime.now().strftime('%Y%m%d')))
+            if (smtp is None):
+                # if no smtp is configured, we must do some output so we'll put it on the file system 
+                self.es.write_email_to_file(email_filename, msg)
+            else:
+                # SMTP is configured, but if email_dir is also configured, let's also output to the file system
+                self.es.send_smtp_email(self.config.from_email, self.config.to_email, msg, smtp.host, smtp.port, smtp.username, smtp.password)
+                if (self.config._email_dir is not None):
+                    self.es.write_email_to_file(email_filename, msg)
+            
 
         logger.info("Finished the Newsletter.")
 
@@ -375,7 +400,7 @@ class Newsletter(object):
 class NibblerConfig(object):
     """Processes configuration for Nibbler, current implementaton is to handle it as options on command line"""
 
-    def __init__(self, to_email, from_email, sub_dir, log_dir=None, db_dir=None, email_dir=None):
+    def __init__(self, to_email, from_email, sub_dir, log_dir=None, smtp_ini=None, db_dir=None, email_dir=None):
         logger.info("Initializing configuration")
         # Load configuration
         self.work_dir = os.path.dirname(os.path.abspath(__file__))
@@ -385,7 +410,7 @@ class NibblerConfig(object):
         self._log_dir = log_dir
         self._db_dir = db_dir
         self._email_dir = email_dir
-
+        self._smtp_ini=smtp_ini
 
     def get_log_dir(self):
         if (self._log_dir is None):
@@ -398,6 +423,19 @@ class NibblerConfig(object):
             self._email_dir = self.work_dir
         logger.debug("email_dir: " + self._email_dir)
         return self._email_dir
+
+    def get_smtp_config(self):
+        smtp_values = None
+        if ((self._smtp_ini) is not None):
+            logger.debug("smtp ini file provided")
+            config = configparser.ConfigParser()
+            config.read(self._smtp_ini)
+            smtp_values={}
+            smtp_values["username"] = config['smtp']['username']
+            smtp_values["password"] = config['smtp']['password']
+            smtp_values["host"] = config['smtp']['host']
+            smtp_values["port"] = config['smtp']['port']
+        return smtp_values
 
     def get_email_image_styles(self):
         key_values={}
@@ -434,4 +472,4 @@ def run_nibbler(args):
     FeedAcquirer(dal, config).main()
 
     # Send Newsletter
-    Newsletter(dal, config).main()
+    NibblerNewsletter(dal, config).main()

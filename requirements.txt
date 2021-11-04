@@ -1,0 +1,6 @@
+lxml
+SQLAlchemy
+feedparser
+opml
+Jinja2
+tox
