@@ -40,6 +40,7 @@ I recommend using a cron job on your local machine or a server to aggregate rss 
 
 A simple RSS to email application.
 
+```
 positional arguments:
   to_email              Recipient email address; youremail@example.com
   from_email            Sender email address; nibble@example.com
@@ -56,16 +57,19 @@ optional arguments:
   -e email_dir, --email-dir email_dir
                         optional path to directory where email file is output before sending
   -v, --version         show program's version number and exit
+```
 
 ## SMTP Notes
 
 A sample smtp.ini file would be:
 
+```
 [smtp]
 username = sample_username
 password = Sample_Password
 host = hostname.example.com
 port = 587
+```
 
 # License
 

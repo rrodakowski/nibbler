@@ -389,7 +389,7 @@ class NibblerNewsletter(object):
                 self.es.write_email_to_file(email_filename, msg)
             else:
                 # SMTP is configured, but if email_dir is also configured, let's also output to the file system
-                self.es.send_smtp_email(self.config.from_email, self.config.to_email, msg, smtp.host, smtp.port, smtp.username, smtp.password)
+                self.es.send_smtp_email(self.config.from_email, self.config.to_email, msg, smtp['host'], smtp['port'], smtp['username'], smtp['password'])
                 if (self.config._email_dir is not None):
                     self.es.write_email_to_file(email_filename, msg)
             
