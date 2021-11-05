@@ -326,7 +326,7 @@ class EmailService(object):
         return msg_root
 
     def write_email_to_file(self, filename, email_msg):
-        self.es.write_text_to_file(filename, email_msg.as_string())
+        self.write_text_to_file(filename, email_msg.as_string())
 
     def send_smtp_email(self, sender, recipient, msg, host, port, smtp_username, smtp_password):
         # Try to send the message.
