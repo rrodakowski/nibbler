@@ -403,7 +403,8 @@ class NibblerConfig(object):
     def __init__(self, to_email, from_email, sub_dir, log_dir=None, smtp_ini=None, db_dir=None, email_dir=None):
         logger.info("Initializing configuration")
         # Load configuration
-        self.work_dir = os.path.dirname(os.path.abspath(__file__))
+        self.work_dir = os.path.dirname(os.path.abspath(__file__))   # finds the path to where nibbler executable is contained, need this to find resources
+        self.cwd = os.cwd()  # find the current working dir
         self.to_email = to_email
         self.from_email = from_email
         self.sub_dir = sub_dir
@@ -414,13 +415,13 @@ class NibblerConfig(object):
 
     def get_log_dir(self):
         if (self._log_dir is None):
-            self._log_dir = self.work_dir
+            self._log_dir = self.cwd
         logger.debug("log_dir: " + self._log_dir)
         return self._log_dir
 
     def get_email_dir(self):
         if (self._email_dir is None):
-            self._email_dir = self.work_dir
+            self._email_dir = self.cwd
         logger.debug("email_dir: " + self._email_dir)
         return self._email_dir
 
