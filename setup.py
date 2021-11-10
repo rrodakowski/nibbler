@@ -26,7 +26,7 @@ setup(
     #
     license="LICENSE.txt",
     description="A simple RSS to email application. Nibbler aggregates your subscriptions and puts them in an email.",
-
+    long_description_content_type="text/markdown",
     long_description=open("README.md").read(),
 
     # Dependent packages (distributions)
