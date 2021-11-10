@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     # Application name:
-    name="nibbler",
+    name="nibbler-rss",
 
     # Version number (initial):
     version="0.1.0",
