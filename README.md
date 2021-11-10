@@ -24,7 +24,7 @@ I have only run it on Ubuntu Linux and Mac machines.
 
 To install: 
 
-pip install nibbler
+pip install nibbler-rss
 
 Until then you can install the required python which are opml ,lxml, feedparser, SQLAlchemy and Jinja2. It stores articles in a sqlite database on your filesystem. 
 
