@@ -404,7 +404,7 @@ class NibblerConfig(object):
         logger.info("Initializing configuration")
         # Load configuration
         self.work_dir = os.path.dirname(os.path.abspath(__file__))   # finds the path to where nibbler executable is contained, need this to find resources
-        self.cwd = os.cwd()  # find the current working dir
+        self.cwd = os.getcwd()  # find the current working dir
         self.to_email = to_email
         self.from_email = from_email
         self.sub_dir = sub_dir
