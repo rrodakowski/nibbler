@@ -206,6 +206,35 @@ class TestFeedAcquirer(NibblerTestCase):
             article = self.feedacquirer.parse_rss_post(entry)
             self.assertEqual(pub_date, article.pub_date, msg='{}, {}'.format(pub_date, article.pub_date))
 
+    def test_parse_rss_post_it_should_return_boilerplate_if_empty_content(self):
+        test_feed = """
+        <channel>
+		<atom:link href="https://unchained.libsyn.com/unchained" rel="self" type="application/rss+xml"/>
+		<title>Unchained</title>
+        <item>
+			<title>This Noble Family's Art Was Taken by Nazis, But Is Being Saved by NFTs - Ep.300</title>
+			<itunes:title>This Noble Family's Art Was Taken by Nazis, But Is Being Saved by NFTs</itunes:title>
+			<pubDate>Tue, 21 Dec 2021 08:30:00 +0000</pubDate>
+			<guid isPermaLink="false"><![CDATA[8d3ec14d-16e6-4f62-8847-917fe13a8b7c]]></guid>
+			<link><![CDATA[https://unchainedpodcast.com/this-noble-familys-art-was-taken-by-nazis-but-is-being-saved-by-nfts/]]></link>
+			<itunes:image href="https://ssl-static.libsyn.com/p/assets/5/e/5/0/5e507f50ba05203140be95ea3302a6a1/Unchained-Podcast-Artwork-2000x2000.png" />
+			<description><![CDATA[]]></description>
+			<content:encoded><![CDATA[]]></content:encoded>
+			<enclosure length="33490781" type="audio/mpeg" url="https://traffic.libsyn.com/secure/unchained/Unchained_-_Ep.300_-_This_Noble_Familys_Art_Was_Taken_by_Nazis_But_Is_Being_Saved_by_NFTs.mp3?dest-id=619174" />
+			<itunes:duration>01:07:16</itunes:duration>
+			<itunes:explicit>clean</itunes:explicit>
+			<itunes:keywords />
+			<itunes:subtitle><![CDATA[]]></itunes:subtitle>
+			<itunes:episode>300</itunes:episode>
+			<itunes:episodeType>full</itunes:episodeType>
+		</item>
+        """
+        rss_feed = feedparser.parse(test_feed)
+        article_text = '<p>No Content Provided in this article.</p>'
+        for entry in rss_feed.entries:
+            article = self.feedacquirer.parse_rss_post(entry)
+            self.assertEqual(article_text, article.article_text, msg='{}, {}'.format(article_text, article.article_text))
+
     #@patch('nibbler.nibbler.DatabaseAccess.is_post_in_db')
     #@patch('nibbler.nibbler.DatabaseAccess.store_post')
     @patch('nibbler.nibbler.DatabaseAccess')

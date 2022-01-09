@@ -216,7 +216,10 @@ class FeedAcquirer(object):
             article.pub_date = datetime.now().strftime("%Y%m%d")
 
         if "content" in post:
-            article.article_text = self.cleaner.clean_html(post.content[0].value)
+            if not post.content[0].value:
+                article.article_text = "No Content Provided in this article."
+            else:
+                article.article_text = self.cleaner.clean_html(post.content[0].value)
             article.article_text = self.cleaner.add_full_image_path(article.article_text, article.link)
         else:
             if "description" in post:
