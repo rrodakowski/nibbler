@@ -6,7 +6,7 @@ Nibbler is a RSS aggregator that collects articles and puts them into a daily em
 
 It is designed to run once day and puts new articles in a single email for that previous day. With only required command line arguments supplied, it will put the email in a file on your filesystem. You could write a script to send this as an email if you have a mail transfer agent on that system or potentially show it as a static page. 
 
-If you can configure or have access to a SMTP server to send email, you can pass in smtp configuration to nibbler. Popular free choices for a SMTP server would be:
+If you have access to a SMTP server to send email, you can pass in smtp configuration to nibbler. Popular free choices for a SMTP server would be:
 
 - gmail
 - sendgrid
