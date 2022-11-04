@@ -1,0 +1,13 @@
+# cruft to ignore
+.Python
+venv/
+dist/
+build/
+nibbler_rss.egg-info/
+nibbler/__pycache__/
+nibbler/tests/__pycache__/
+pyvenv.cfg
+nibbler.db
+*.log
+*.eml
+
