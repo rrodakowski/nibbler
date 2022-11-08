@@ -27,6 +27,6 @@ uninstall:
 
 # Clean the workspace
 clean:
-	rm *.log
-	rm *.eml
-	rm nibbler.db
+	rm -f *.log
+	rm -f *.eml
+	rm -f nibbler.db
