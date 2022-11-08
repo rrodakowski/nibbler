@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 # figure out which posts to email
 posts_to_email = []
 base = declarative_base()
-config = None
 
 
 def ensure_dir(directory):
