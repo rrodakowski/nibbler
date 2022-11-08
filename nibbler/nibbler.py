@@ -359,7 +359,7 @@ class NibblerNewsletter():
         logger.info("Init for BuildNibblerNewsletter")
         self.config = appconfig
         self.resource_dir = os.path.join(self.config.work_dir, "resources")
-        self.es = EmailService()
+        self.email = EmailService()
         self.dal = dal
 
         # move this to dependency injection?
@@ -375,7 +375,7 @@ class NibblerNewsletter():
         images = {"image1": os.path.join(self.resource_dir, "system.png"),
                   "image2": os.path.join(self.resource_dir, "GitHub-Mark-Light-32px.png")}
 
-        return self.es.build_html_email(self.config.from_email, self.config.to_email, subject, text, html, images)
+        return self.email.build_html_email(self.config.from_email, self.config.to_email, subject, text, html, images)
 
     def main(self):
         """Steps to build an email for nibbler. """
@@ -396,13 +396,13 @@ class NibblerNewsletter():
                                           f"nibbler_{datetime.now().strftime('%Y%m%d')}.eml")
             if smtp is None:
                 # if no smtp is configured, still make some outut so put it on the file system
-                self.es.write_email_to_file(email_filename, msg)
+                self.email.write_email_to_file(email_filename, msg)
             else:
                 # SMTP is configured, but if email_dir is also configured,
                 # the let's also output to the file system
-                self.es.send_smtp_email(self.config.from_email, self.config.to_email, msg, smtp['host'], smtp['port'], smtp['username'], smtp['password'])
+                self.email.send_smtp_email(self.config.from_email, self.config.to_email, msg, smtp['host'], smtp['port'], smtp['username'], smtp['password'])
                 if self.config._email_dir is not None:
-                    self.es.write_email_to_file(email_filename, msg)
+                    self.email.write_email_to_file(email_filename, msg)
 
         logger.info("Finished the Newsletter.")
 
