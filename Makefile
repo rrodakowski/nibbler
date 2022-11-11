@@ -17,7 +17,19 @@ $(VENV)/bin/activate: requirements.txt
 
 # Run all the tests
 test: $(VENV)/bin/activate
-	. $(VENV)/bin/activate; python3 -m unittest
+	. $(VENV)/bin/activate; $(PYTHON) -m unittest
+
+# Run the linter
+lint: test
+	. $(VENV)/bin/activate; $(PIP) install pylint; pylint nibbler; 
+
+# Build a wheel
+wheel: test
+	. $(VENV)/bin/activate; $(PIP) install build; $(PYTHON) -m build --wheel
+
+# Deploy to test version of pypi
+deploy: wheel
+	. $(VENV)/bin/activate; $(PIP) install twine; twine upload dist/nibbler*.whl --verbose --repository testpypi
 
 # Destroy/uninstall the virtualenv and pycache
 uninstall:
@@ -30,3 +42,6 @@ clean:
 	rm -f *.log
 	rm -f *.eml
 	rm -f nibbler.db
+	rm -rf dist
+	rm -rf nibbler_rss.egg-info
+	rm -rf build

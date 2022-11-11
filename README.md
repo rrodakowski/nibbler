@@ -26,7 +26,7 @@ To install:
 
 pip install nibbler-rss
 
-Until then you can install the required python which are opml, lxml, feedparser, SQLAlchemy and Jinja2. It stores articles in a sqlite database on your filesystem. 
+Until then you can install the required python which are lxml, feedparser, SQLAlchemy and Jinja2. It stores articles in a sqlite database on your filesystem. 
 
 Then you can run it with this command:
 

@@ -16,9 +16,7 @@ from email.mime.image import MIMEImage
 from email import charset
 
 # Dependency Imports
-# opml and feedparser
 import feedparser
-import opml
 # jinja2 imports
 from jinja2 import Environment, PackageLoader
 # lxml imports
@@ -30,6 +28,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import sessionmaker
+
+# Import python modules from the project
+from nibbler import opml
 
 logger = logging.getLogger(__name__)
 

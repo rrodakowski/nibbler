@@ -5,7 +5,7 @@ setup(
     name="nibbler-rss",
 
     # Version number (initial):
-    version="0.1.0",
+    version="0.2.0",
 
     # Application author details:
     author="Randall Rodakowski",
@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
 
     # Details
-    url="http://pypi.python.org/pypi/Nibbler_v010/",
+    url="https://github.com/rrodakowski/nibbler",
 
     #
     license="LICENSE.txt",
@@ -34,7 +34,6 @@ setup(
         "lxml",
         "SQLAlchemy",
         "feedparser",
-        "opml",
         "Jinja2",
     ],
 
