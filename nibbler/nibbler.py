@@ -40,6 +40,7 @@ base = declarative_base()
 
 
 def ensure_dir(directory):
+    """ make sure directory exists """
     if not os.path.exists(directory):
         os.makedirs(directory)
 

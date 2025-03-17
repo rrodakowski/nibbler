@@ -65,4 +65,3 @@ def from_string(opml_text):
 def parse(opml_url):
 
     return Opml(lxml.etree.parse(opml_url))
-
