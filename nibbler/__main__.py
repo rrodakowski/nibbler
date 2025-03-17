@@ -12,7 +12,7 @@ def main():
     parser.add_argument('-s', '--smtp-ini', metavar='smtp_ini', help='optional path to smtp ini file')
     parser.add_argument('-d', '--db-dir', metavar='db_dir', help='optional path to sqlite db dir')
     parser.add_argument('-e', '--email-dir', metavar='email_dir', help='optional path to directory where email file is output before sending')
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.3')
 
     args = parser.parse_args()
 

@@ -5,7 +5,7 @@ setup(
     name="nibbler-rss",
 
     # Version number (initial):
-    version="0.2.0",
+    version="0.3.0",
 
     # Application author details:
     author="Randall Rodakowski",
@@ -31,10 +31,10 @@ setup(
 
     # Dependent packages (distributions)
     install_requires=[
-        "lxml",
-        "SQLAlchemy",
-        "feedparser",
-        "Jinja2",
+        "lxml==5.1.0",
+        "SQLAlchemy==2.0.39",
+        "feedparser==6.0.11",
+        "Jinja2==3.1.6",
     ],
 
     entry_points={
